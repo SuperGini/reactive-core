@@ -1,12 +1,13 @@
-spring:
-  application:
-    name: reactive-core
-
 server:
   port: 8090
 
-
-
+spring:
+  application:
+    name: reactive-core
+  datasource:
+    url:
+    username:
+    password:
 
 
 
