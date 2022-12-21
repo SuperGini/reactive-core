@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: reactive-core
+
+server:
+  port: 8090
+
+
+
+
+
+
