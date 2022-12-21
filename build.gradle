@@ -25,10 +25,13 @@ dependencies {
     implementation 'org.flywaydb:flyway-mysql'
     implementation 'org.springframework:spring-jdbc'
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.mysql:mysql-connector-j' // -> used for flyway migration
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
+
+    // https://mvnrepository.com/artifact/dev.miku/r2dbc-mysql -> for CRUD operations
+    implementation group: 'dev.miku', name: 'r2dbc-mysql', version: '0.8.2.RELEASE'
 }
 
 tasks.named('test') {
