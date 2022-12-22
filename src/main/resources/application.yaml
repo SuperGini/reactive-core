@@ -4,18 +4,14 @@ server:
 spring:
   application:
     name: reactive-core
-  r2dbc:
-    url: r2dbc:mysql://localhost:3306/reactive_core
-    username:
-    password:
 
 # https://stackoverflow.com/questions/59553647/how-to-run-flyway-migration-for-reactive-r2dbc-driver-on-sprintboot-stratup:
-  flyway:
-    enabled: true
-    url: jdbc:mysql://localhost:3306/reactive_core
-    user: ${spring.r2dbc.username}
-    password: ${spring.r2dbc.password}
-    locations: classpath:db/migration
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: reactive_core
+
 
 
 
