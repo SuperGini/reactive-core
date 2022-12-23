@@ -12,6 +12,9 @@ spring:
       port: 27017
       database: reactive_core
 
+logging:
+  level:
+    com.gini: DEBUG
 
 
 

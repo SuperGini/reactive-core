@@ -8,9 +8,11 @@ import com.gini.mapper.response.CustomerResponseMapper;
 import com.gini.model.Customer;
 import com.gini.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
@@ -24,6 +26,7 @@ public class CustomerService {
 
         Customer customer = customerRequestMapper.mapFrom(customerRequest);
 
+        log.info("Saving customer: {} to mongo database", customer);
         return customerRepository
                 .save(customer)
                 .map(customerResponseMapper::mapFrom)
