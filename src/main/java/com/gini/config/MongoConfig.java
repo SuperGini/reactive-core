@@ -16,7 +16,6 @@ public class MongoConfig {
     @Value("${spring.data.mongodb.database}")
     private String databaseName;
 
-
     @Bean
     public ReactiveMongoTemplate reactiveMongoTemplate(MongoClient mongoClient) {
         ReactiveMongoTemplate mongoTemplate = new ReactiveMongoTemplate(mongoClient, databaseName);

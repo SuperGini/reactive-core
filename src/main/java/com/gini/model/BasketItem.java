@@ -1,15 +1,24 @@
 package com.gini.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
+@Getter
+@Setter
+@Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class BasketItem {
 
     private String itemName;
     private Integer itemsNumber;
     private BigDecimal price;
-    private Customer customer;
 
 }

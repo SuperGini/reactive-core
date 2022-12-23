@@ -1,29 +1,27 @@
-package com.gini.model;
+package com.gini.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Builder
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Document("customer")
-public class Customer {
+public class CustomerRequest {
 
-    @Id
     private String id;
     private String username;
     private String firstName;
     private String lastName;
-    private Address address;
-    private Set<BasketItem> basketItems = new HashSet<>();
+    private AddressRequest address;
+    private Set<BasketItemRequest> basketItems = new HashSet<>();
 
 
 }

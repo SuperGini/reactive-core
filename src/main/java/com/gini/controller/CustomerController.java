@@ -1,11 +1,14 @@
 package com.gini.controller;
 
-import com.gini.model.Customer;
-import com.gini.repository.CustomerRepository;
+import com.gini.dto.request.CustomerRequest;
+import com.gini.dto.response.CustomerResponse;
+import com.gini.service.CustomerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -13,16 +16,13 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CustomerController {
 
-    private final CustomerRepository customerRepository;
+    private final CustomerService customerService;
 
     @PostMapping(value = "/customer", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Mono<Customer> saveCustomer(@RequestBody Customer customer) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<CustomerResponse> saveCustomer(@RequestBody CustomerRequest customerRequest) {
 
-        Customer x = customer;
-
-
-        return customerRepository.save(customer);
-
+        return customerService.saveCustomer(customerRequest);
     }
 
 
