@@ -3,6 +3,7 @@ package com.gini.error.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gini.error.ErrorResponse;
+import com.gini.exceptions.CustomerAlreadyExistsException;
 import com.gini.exceptions.CustomerNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,37 +22,50 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class GlobalErrorHandler implements ErrorWebExceptionHandler {
 
+    private static final String DEFAULT_ERROR_MESSAGE = "Unable to process request";
+
     private final ObjectMapper objectMapper;
+
 
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
 
         DataBufferFactory dataBufferFactory = exchange.getResponse().bufferFactory();
-        DataBuffer errorResponse;
 
         if(ex instanceof CustomerNotFoundException){
-            log.debug("Error message: {}", ex.getMessage());
-            exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
-            exchange.getResponse().getHeaders().setContentType(MediaType.TEXT_EVENT_STREAM);
-
-            try {
-                errorResponse = dataBufferFactory.wrap(objectMapper.writeValueAsBytes(
-                        new ErrorResponse(
-                                HttpStatus.BAD_REQUEST.value(),
-                                ex.getMessage()
-                        )
-                ));
-            } catch (JsonProcessingException e) {
-                exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-                errorResponse = dataBufferFactory.wrap("Unknown error".getBytes());
-            }
-
-            return exchange.getResponse().writeWith(Mono.just(errorResponse));
+            return mappingErrorResponse(exchange, ex.getMessage(), dataBufferFactory, HttpStatus.BAD_REQUEST);
         }
 
-        log.debug("Error message: {}", ex.getMessage());
-        exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-        errorResponse = dataBufferFactory.wrap("Unknown error".getBytes());
+        if(ex instanceof CustomerAlreadyExistsException){
+           return mappingErrorResponse(exchange, ex.getMessage(), dataBufferFactory, HttpStatus.BAD_REQUEST);
+
+        }
+
+         return mappingErrorResponse(exchange, DEFAULT_ERROR_MESSAGE, dataBufferFactory, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private Mono<Void> mappingErrorResponse(ServerWebExchange exchange,
+                                            String errorMessage,
+                                            DataBufferFactory dataBufferFactory,
+                                            HttpStatus status) {
+
+        DataBuffer errorResponse;
+        log.debug("Error message: {}", errorMessage);
+        exchange.getResponse().setStatusCode(status);
+        exchange.getResponse().getHeaders().setContentType(MediaType.TEXT_EVENT_STREAM);
+
+        try {
+            errorResponse = dataBufferFactory.wrap(objectMapper.writeValueAsBytes(
+                    new ErrorResponse(
+                            status.value(),
+                            errorMessage
+                    )
+            ));
+        } catch (JsonProcessingException e) {
+            exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+            errorResponse = dataBufferFactory.wrap("Unknown error".getBytes());
+        }
+
         return exchange.getResponse().writeWith(Mono.just(errorResponse));
     }
 }

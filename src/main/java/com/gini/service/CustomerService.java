@@ -3,7 +3,7 @@ package com.gini.service;
 import com.gini.dto.request.AddressRequest;
 import com.gini.dto.request.CustomerRequest;
 import com.gini.dto.response.CustomerResponse;
-import com.gini.exceptions.CustomerAlreadyExists;
+import com.gini.exceptions.CustomerAlreadyExistsException;
 import com.gini.exceptions.CustomerNotFoundException;
 import com.gini.mapper.request.AddressRequestMapper;
 import com.gini.mapper.request.CustomerRequestMapper;
@@ -73,7 +73,8 @@ public class CustomerService {
 
     private void throwErrorIfCustomerExists(Customer customer) {
         if (customer != null) {
-            throw new CustomerAlreadyExists("Customer already exists");
+            log.error("Customer with username: {} --> already exists", customer.getUsername());
+            throw new CustomerAlreadyExistsException("Customer already exists");
         }
     }
 }
