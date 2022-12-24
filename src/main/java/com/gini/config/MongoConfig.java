@@ -21,7 +21,7 @@ public class MongoConfig {
         ReactiveMongoTemplate mongoTemplate = new ReactiveMongoTemplate(mongoClient, databaseName);
         mongoTemplate.indexOps("customer") // collection name string or .class
                 .ensureIndex(
-                        new Index().on("username", Sort.Direction.ASC)
+                        new Index().on("username", Sort.Direction.ASC).unique()
                 ).subscribe();
 
         return mongoTemplate;

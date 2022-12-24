@@ -3,6 +3,7 @@ package com.gini.service;
 import com.gini.dto.request.AddressRequest;
 import com.gini.dto.request.CustomerRequest;
 import com.gini.dto.response.CustomerResponse;
+import com.gini.exceptions.CustomerAlreadyExists;
 import com.gini.exceptions.CustomerNotFoundException;
 import com.gini.mapper.request.AddressRequestMapper;
 import com.gini.mapper.request.CustomerRequestMapper;
@@ -29,14 +30,14 @@ public class CustomerService {
 
 
     public Mono<CustomerResponse> saveCustomer(CustomerRequest customerRequest) {
+        var customer = customerRequestMapper.mapFrom(customerRequest);
 
-        Customer customer = customerRequestMapper.mapFrom(customerRequest);
-
-        log.info("Saving customer: {} to mongo database", customer);
-        return customerRepository
-                .save(customer)
+        return customerRepository.findCustomerByUsername(customerRequest.getUsername())
+                .doOnNext(this::throwErrorIfCustomerExists)
+                .switchIfEmpty(customerRepository.save(customer))
                 .map(customerResponseMapper::mapFrom)
                 .log();
+
     }
 
     public Mono<CustomerResponse> findCustomerByUsername(String username) {
@@ -68,5 +69,11 @@ public class CustomerService {
     private Customer setCustomerAddress(AddressRequest addressRequest, Customer customer) {
         customer.setAddress(addressRequestMapper.mapFrom(addressRequest));
         return customer;
+    }
+
+    private void throwErrorIfCustomerExists(Customer customer) {
+        if (customer != null) {
+            throw new CustomerAlreadyExists("Customer already exists");
+        }
     }
 }
