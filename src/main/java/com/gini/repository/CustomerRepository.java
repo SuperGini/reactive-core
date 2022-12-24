@@ -9,4 +9,6 @@ public interface CustomerRepository extends ReactiveMongoRepository<Customer, In
 
     Mono<Customer> findCustomerByUsername(String username);
 
+    Mono<Void> deleteCustomerByUsername(String username);
+
 }

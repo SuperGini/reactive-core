@@ -49,8 +49,8 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
                                             DataBufferFactory dataBufferFactory,
                                             HttpStatus status) {
 
-        DataBuffer errorResponse;
         log.debug("Error message: {}", errorMessage);
+        DataBuffer errorResponse;
         exchange.getResponse().setStatusCode(status);
         exchange.getResponse().getHeaders().setContentType(MediaType.TEXT_EVENT_STREAM);
 

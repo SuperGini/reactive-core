@@ -56,7 +56,7 @@ public class CustomerService {
                 .log();
     }
 
-    public Mono<CustomerResponse> updateAddress(AddressRequest addressRequest, String username) {
+    public Mono<CustomerResponse> updateCustomerAddress(AddressRequest addressRequest, String username) {
 
         return customerRepository.findCustomerByUsername(username)
                 .switchIfEmpty(Mono.error(new CustomerNotFoundException("Customer not found........")))
@@ -65,6 +65,15 @@ public class CustomerService {
                 .map(customerResponseMapper::mapFrom)
                 .log();
     }
+
+    public Mono<Void> deleteCustomerByUsername(String username){
+        return customerRepository.findCustomerByUsername(username)
+                .switchIfEmpty(Mono.error(new CustomerNotFoundException("Customer with username: " + username + " does not exists")))
+                .flatMap(x -> customerRepository.deleteCustomerByUsername(x.getUsername()));
+    }
+
+
+
 
     private Customer setCustomerAddress(AddressRequest addressRequest, Customer customer) {
         customer.setAddress(addressRequestMapper.mapFrom(addressRequest));
