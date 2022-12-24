@@ -32,7 +32,7 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
         if(ex instanceof CustomerNotFoundException){
             log.debug("Error message: {}", ex.getMessage());
             exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
-            exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            exchange.getResponse().getHeaders().setContentType(MediaType.TEXT_EVENT_STREAM);
 
             try {
                 errorResponse = dataBufferFactory.wrap(objectMapper.writeValueAsBytes(

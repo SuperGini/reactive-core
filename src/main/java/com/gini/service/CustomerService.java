@@ -1,8 +1,10 @@
 package com.gini.service;
 
+import com.gini.dto.request.AddressRequest;
 import com.gini.dto.request.CustomerRequest;
 import com.gini.dto.response.CustomerResponse;
 import com.gini.exceptions.CustomerNotFoundException;
+import com.gini.mapper.request.AddressRequestMapper;
 import com.gini.mapper.request.CustomerRequestMapper;
 import com.gini.mapper.response.CustomerResponseMapper;
 import com.gini.model.Customer;
@@ -10,7 +12,10 @@ import com.gini.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 @Slf4j
 @Service
@@ -20,6 +25,7 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerRequestMapper customerRequestMapper;
     private final CustomerResponseMapper customerResponseMapper;
+    private final AddressRequestMapper addressRequestMapper;
 
 
     public Mono<CustomerResponse> saveCustomer(CustomerRequest customerRequest) {
@@ -40,5 +46,27 @@ public class CustomerService {
                 .switchIfEmpty(Mono.error(new CustomerNotFoundException("Customer not found........")))
                 .map(customerResponseMapper::mapFrom)
                 .log();
+    }
+
+    public Flux<CustomerResponse> findAllCustomers() {
+        return customerRepository.findAll()
+                .map(customerResponseMapper::mapFrom)
+                .delayElements(Duration.ofSeconds(2)) //delay elements to see if the flux works
+                .log();
+    }
+
+    public Mono<CustomerResponse> updateAddress(AddressRequest addressRequest, String username) {
+
+        return customerRepository.findCustomerByUsername(username)
+                .switchIfEmpty(Mono.error(new CustomerNotFoundException("Customer not found........")))
+                .map(c -> setCustomerAddress(addressRequest, c))
+                .flatMap(customerRepository::save)
+                .map(customerResponseMapper::mapFrom)
+                .log();
+    }
+
+    private Customer setCustomerAddress(AddressRequest addressRequest, Customer customer) {
+        customer.setAddress(addressRequestMapper.mapFrom(addressRequest));
+        return customer;
     }
 }
