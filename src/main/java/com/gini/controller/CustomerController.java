@@ -1,6 +1,7 @@
 package com.gini.controller;
 
 import com.gini.dto.request.AddressRequest;
+import com.gini.dto.request.BasketItemRequest;
 import com.gini.dto.request.CustomerRequest;
 import com.gini.dto.response.CustomerResponse;
 import com.gini.service.CustomerService;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,9 +55,16 @@ public class CustomerController {
     }
 
     @DeleteMapping(value = "/customer/{username}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Mono<Void> deleteCustomerByUsername(@PathVariable String username){
+    public Mono<Void> deleteCustomerByUsername(@PathVariable String username) {
 
         return customerService.deleteCustomerByUsername(username);
+    }
+
+    @PutMapping(value = "/basketItems/{username}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Mono<CustomerResponse> updateCustomerWithBasketItems(@RequestBody Set<BasketItemRequest> basketItemRequests,
+                                                                @PathVariable String username) {
+
+        return customerService.updateCustomerWithBasketItems(basketItemRequests, username);
     }
 
 

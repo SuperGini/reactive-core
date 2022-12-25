@@ -1,13 +1,16 @@
 package com.gini.service;
 
 import com.gini.dto.request.AddressRequest;
+import com.gini.dto.request.BasketItemRequest;
 import com.gini.dto.request.CustomerRequest;
 import com.gini.dto.response.CustomerResponse;
 import com.gini.exceptions.CustomerAlreadyExistsException;
 import com.gini.exceptions.CustomerNotFoundException;
 import com.gini.mapper.request.AddressRequestMapper;
+import com.gini.mapper.request.BasketItemRequestMapper;
 import com.gini.mapper.request.CustomerRequestMapper;
 import com.gini.mapper.response.CustomerResponseMapper;
+import com.gini.model.BasketItem;
 import com.gini.model.Customer;
 import com.gini.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +20,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.HashSet;
+import java.util.Set;
 
+//https://stackoverflow.com/questions/53595420/correct-way-of-throwing-exceptions-with-reactor
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,7 @@ public class CustomerService {
     private final CustomerRequestMapper customerRequestMapper;
     private final CustomerResponseMapper customerResponseMapper;
     private final AddressRequestMapper addressRequestMapper;
+    private final BasketItemRequestMapper basketItemRequestMapper;
 
 
     public Mono<CustomerResponse> saveCustomer(CustomerRequest customerRequest) {
@@ -72,7 +79,27 @@ public class CustomerService {
                 .flatMap(x -> customerRepository.deleteCustomerByUsername(x.getUsername()));
     }
 
+    public Mono<CustomerResponse> updateCustomerWithBasketItems(Set<BasketItemRequest> basketItemsRequest, String username){
 
+        return customerRepository.findCustomerByUsername(username)
+                .switchIfEmpty(Mono.error(new CustomerNotFoundException("Customer not found........")))
+                .map(c -> addBasketItemsToCustomer(basketItemsRequest,c))
+                .map(customerResponseMapper::mapFrom)
+                .log();
+
+    }
+
+    private Customer addBasketItemsToCustomer(Set<BasketItemRequest> basketItemsRequest, Customer c) {
+
+        Set<BasketItem> basketItems = new HashSet<>();
+
+        basketItemsRequest.stream()
+                .map(basketItemRequestMapper::mapFrom)
+                .forEach(basketItems::add);
+
+        c.setBasketItems(basketItems);
+        return c;
+    }
 
 
     private Customer setCustomerAddress(AddressRequest addressRequest, Customer customer) {
