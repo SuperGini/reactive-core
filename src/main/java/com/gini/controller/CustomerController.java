@@ -29,13 +29,13 @@ public class CustomerController {
 
     @PostMapping(value = "/customer", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<CustomerResponse> saveCustomer(@RequestBody CustomerRequest customerRequest) {
+    public Flux<CustomerResponse> saveCustomer(@RequestBody CustomerRequest customerRequest) {
 
         return customerService.saveCustomer(customerRequest);
     }
 
     @GetMapping(value = "/customer/{username}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Mono<CustomerResponse> getCustomer(@PathVariable String username) {
+    public Flux<CustomerResponse> getCustomer(@PathVariable String username) {
 
         return customerService.findCustomerByUsername(username);
     }

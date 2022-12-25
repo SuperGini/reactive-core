@@ -38,7 +38,7 @@ public class CustomerService {
     private final BasketItemRequestMapper basketItemRequestMapper;
 
 
-    public Mono<CustomerResponse> saveCustomer(CustomerRequest customerRequest) {
+    public Flux<CustomerResponse> saveCustomer(CustomerRequest customerRequest) {
         var customer = customerRequestMapper.mapFrom(customerRequest);
 
         return customerRepository.findCustomerByUsername(customerRequest.getUsername())
@@ -49,7 +49,7 @@ public class CustomerService {
 
     }
 
-    public Mono<CustomerResponse> findCustomerByUsername(String username) {
+    public Flux<CustomerResponse> findCustomerByUsername(String username) {
         // finds the customer. If the customer is not found it will switch and throw a Mono.error()
         // if the customer is found it will skip switchIfEmpty() and map the response
         return customerRepository.findCustomerByUsername(username)
@@ -65,7 +65,7 @@ public class CustomerService {
                 .log();
     }
 
-    public Mono<CustomerResponse> updateCustomerAddress(AddressRequest addressRequest, String username) {
+    public Flux<CustomerResponse> updateCustomerAddress(AddressRequest addressRequest, String username) {
 
         return customerRepository.findCustomerByUsername(username)
                 .map(c -> setCustomerAddress(addressRequest, c))
@@ -75,13 +75,13 @@ public class CustomerService {
                 .log();
     }
 
-    public Mono<Void> deleteCustomerByUsername(String username){
+    public Flux<Void> deleteCustomerByUsername(String username){
         return customerRepository.findCustomerByUsername(username)
                 .switchIfEmpty(Mono.error(new CustomerNotFoundException("Customer with username: " + username + " does not exists")))
                 .flatMap(x -> customerRepository.deleteCustomerByUsername(x.getUsername()));
     }
 
-    public Mono<CustomerResponse> updateCustomerWithBasketItems(Set<BasketItemRequest> basketItemsRequest, String username){
+    public Flux<CustomerResponse> updateCustomerWithBasketItems(Set<BasketItemRequest> basketItemsRequest, String username){
 
         return customerRepository.findCustomerByUsername(username)
                 .map(c -> addBasketItemsToCustomer(basketItemsRequest,c))
