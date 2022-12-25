@@ -47,7 +47,7 @@ public class CustomerController {
     }
 
     @PutMapping(value = "/customer/{username}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Mono<CustomerResponse> updateCustomerAddress(@RequestBody AddressRequest addressRequest,
+    public Flux<CustomerResponse> updateCustomerAddress(@RequestBody AddressRequest addressRequest,
                                                         @PathVariable String username) {
 
         return customerService.updateCustomerAddress(addressRequest, username);
@@ -55,13 +55,13 @@ public class CustomerController {
     }
 
     @DeleteMapping(value = "/customer/{username}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Mono<Void> deleteCustomerByUsername(@PathVariable String username) {
+    public Flux<Void> deleteCustomerByUsername(@PathVariable String username) {
 
         return customerService.deleteCustomerByUsername(username);
     }
 
     @PutMapping(value = "/basketItems/{username}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Mono<CustomerResponse> updateCustomerWithBasketItems(@RequestBody Set<BasketItemRequest> basketItemRequests,
+    public Flux<CustomerResponse> updateCustomerWithBasketItems(@RequestBody Set<BasketItemRequest> basketItemRequests,
                                                                 @PathVariable String username) {
 
         return customerService.updateCustomerWithBasketItems(basketItemRequests, username);
