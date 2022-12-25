@@ -2,7 +2,6 @@ package com.gini.error.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gini.error.ErrorResponse;
 import com.gini.exceptions.CustomerAlreadyExistsException;
 import com.gini.exceptions.CustomerNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +11,12 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.net.URI;
 
 //https://medium.com/@akhil.bojedla/exception-handling-spring-webflux-b11647d8608
 @Slf4j
@@ -55,12 +57,11 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
         exchange.getResponse().getHeaders().setContentType(MediaType.TEXT_EVENT_STREAM);
 
         try {
-            errorResponse = dataBufferFactory.wrap(objectMapper.writeValueAsBytes(
-                    new ErrorResponse(
-                            status.value(),
-                            errorMessage
-                    )
-            ));
+            var error = ProblemDetail.forStatusAndDetail(status, errorMessage);
+            error.setType(URI.create(""));
+
+            errorResponse = dataBufferFactory.wrap(objectMapper.writeValueAsBytes(error));
+
         } catch (JsonProcessingException e) {
             exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
             errorResponse = dataBufferFactory.wrap("Unknown error".getBytes());
