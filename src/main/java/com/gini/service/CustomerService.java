@@ -29,6 +29,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class CustomerService {
 
+    private final static String CUSTOMER_NOT_FOUND = "Customer not found........";
+
     private final CustomerRepository customerRepository;
     private final CustomerRequestMapper customerRequestMapper;
     private final CustomerResponseMapper customerResponseMapper;
@@ -51,8 +53,8 @@ public class CustomerService {
         // finds the customer. If the customer is not found it will switch and throw a Mono.error()
         // if the customer is found it will skip switchIfEmpty() and map the response
         return customerRepository.findCustomerByUsername(username)
-                .switchIfEmpty(Mono.error(new CustomerNotFoundException("Customer not found........")))
                 .map(customerResponseMapper::mapFrom)
+                .switchIfEmpty(Mono.error(new CustomerNotFoundException(CUSTOMER_NOT_FOUND)))
                 .log();
     }
 
@@ -66,10 +68,10 @@ public class CustomerService {
     public Mono<CustomerResponse> updateCustomerAddress(AddressRequest addressRequest, String username) {
 
         return customerRepository.findCustomerByUsername(username)
-                .switchIfEmpty(Mono.error(new CustomerNotFoundException("Customer not found........")))
                 .map(c -> setCustomerAddress(addressRequest, c))
                 .flatMap(customerRepository::save)
                 .map(customerResponseMapper::mapFrom)
+                .switchIfEmpty(Mono.error(new CustomerNotFoundException(CUSTOMER_NOT_FOUND)))
                 .log();
     }
 
@@ -82,9 +84,9 @@ public class CustomerService {
     public Mono<CustomerResponse> updateCustomerWithBasketItems(Set<BasketItemRequest> basketItemsRequest, String username){
 
         return customerRepository.findCustomerByUsername(username)
-                .switchIfEmpty(Mono.error(new CustomerNotFoundException("Customer not found........")))
                 .map(c -> addBasketItemsToCustomer(basketItemsRequest,c))
                 .map(customerResponseMapper::mapFrom)
+                .switchIfEmpty(Mono.error(new CustomerNotFoundException(CUSTOMER_NOT_FOUND)))
                 .log();
 
     }
