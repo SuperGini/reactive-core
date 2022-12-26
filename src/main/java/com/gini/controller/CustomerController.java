@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.Set;
 
@@ -40,7 +39,7 @@ public class CustomerController {
         return customerService.findCustomerByUsername(username);
     }
 
-    @GetMapping("/customers")
+    @GetMapping(value = "/customers", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<CustomerResponse> getAllCustomers() {
 
         return customerService.findAllCustomers();

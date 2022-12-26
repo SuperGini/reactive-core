@@ -32,27 +32,27 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
 
-        DataBufferFactory dataBufferFactory = exchange.getResponse().bufferFactory();
 
         if(ex instanceof CustomerNotFoundException){
-            return mappingErrorResponse(exchange, ex.getMessage(), dataBufferFactory, HttpStatus.BAD_REQUEST);
+            return mappingErrorResponse(exchange, ex.getMessage(), HttpStatus.NOT_FOUND);
         }
 
         if(ex instanceof CustomerAlreadyExistsException){
-           return mappingErrorResponse(exchange, ex.getMessage(), dataBufferFactory, HttpStatus.BAD_REQUEST);
+           return mappingErrorResponse(exchange, ex.getMessage(), HttpStatus.BAD_REQUEST);
 
         }
 
-         return mappingErrorResponse(exchange, DEFAULT_ERROR_MESSAGE, dataBufferFactory, HttpStatus.INTERNAL_SERVER_ERROR);
+         return mappingErrorResponse(exchange, DEFAULT_ERROR_MESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private Mono<Void> mappingErrorResponse(ServerWebExchange exchange,
                                             String errorMessage,
-                                            DataBufferFactory dataBufferFactory,
                                             HttpStatus status) {
 
         log.debug("Error message: {}", errorMessage);
+        DataBufferFactory dataBufferFactory = exchange.getResponse().bufferFactory();
         DataBuffer errorResponse;
+
         exchange.getResponse().setStatusCode(status);
         exchange.getResponse().getHeaders().setContentType(MediaType.TEXT_EVENT_STREAM);
 
@@ -62,11 +62,10 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
 
             errorResponse = dataBufferFactory.wrap(objectMapper.writeValueAsBytes(error));
 
-        } catch (JsonProcessingException e) {
-            exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-            errorResponse = dataBufferFactory.wrap("Unknown error".getBytes());
-        }
+            return exchange.getResponse().writeWith(Mono.just(errorResponse));
 
-        return exchange.getResponse().writeWith(Mono.just(errorResponse));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
