@@ -29,7 +29,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class CustomerService {
 
-    private final static String CUSTOMER_NOT_FOUND = "Customer not found........";
+    private static final String CUSTOMER_NOT_FOUND = "Customer not found........";
 
     private final CustomerRepository customerRepository;
     private final CustomerRequestMapper customerRequestMapper;
@@ -85,6 +85,7 @@ public class CustomerService {
 
         return customerRepository.findCustomerByUsername(username)
                 .map(c -> addBasketItemsToCustomer(basketItemsRequest,c))
+                .flatMap(customerRepository::save)
                 .map(customerResponseMapper::mapFrom)
                 .switchIfEmpty(Mono.error(new CustomerNotFoundException(CUSTOMER_NOT_FOUND)))
                 .log();
@@ -99,7 +100,7 @@ public class CustomerService {
                 .map(basketItemRequestMapper::mapFrom)
                 .forEach(basketItems::add);
 
-        c.setBasketItems(basketItems);
+        c.getBasketItems().addAll(basketItems);
         return c;
     }
 

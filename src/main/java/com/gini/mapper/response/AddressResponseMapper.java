@@ -12,6 +12,8 @@ public class AddressResponseMapper implements Mapper<AddressResponse, Address> {
     @Override
     public AddressResponse mapFrom(Address address) {
 
+        if(address == null) return null;
+
         return new AddressResponse(
                 address.getStreet(),
                 address.getStreetNumber(),

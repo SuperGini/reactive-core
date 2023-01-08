@@ -16,9 +16,18 @@ configurations {
 
 repositories {
     mavenCentral()
+//    maven {
+//        name = "GitHubPackages"
+//        url = "https://maven.pkg.github.com/SuperGini/customer-library"
+//        credentials {
+//            username = project.findProperty("user") ?: System.getenv("GITHUB_ACTOR")
+//            password = project.findProperty("token") ?: System.getenv("GITHUB_TOKEN")
+//        }
+//    }
 }
 
 dependencies {
+//    implementation 'customer-library:lib:1.0'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
     compileOnly 'org.projectlombok:lombok'

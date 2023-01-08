@@ -12,6 +12,8 @@ public class AddressRequestMapper implements Mapper<Address, AddressRequest> {
     @Override
     public Address mapFrom(AddressRequest addressRequest) {
 
+        if(addressRequest == null) return null;
+
         return new Address(
                 addressRequest.street(),
                 addressRequest.streetNumber(),

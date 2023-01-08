@@ -12,6 +12,8 @@ public class BasketItemRequestMapper implements Mapper<BasketItem, BasketItemReq
     @Override
     public BasketItem mapFrom(BasketItemRequest basketItemRequest) {
 
+        if (basketItemRequest == null) return null;
+
         return new BasketItem(
                 basketItemRequest.itemName(),
                 basketItemRequest.itemsNumber(),
